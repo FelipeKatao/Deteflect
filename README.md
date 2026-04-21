@@ -1,4 +1,4 @@
-# DataFlect
+# Deteflect
 Intention discovery project in a prompt, using an API for parameter passing, using a prompt as context reading
 
 ## Configuração do projeto
