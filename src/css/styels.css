@@ -28,7 +28,11 @@ body{
     overflow: auto;
     margin: auto;
 }
+.msg_receiver{
+     animation: entrada 1s;
+}
 .msg_sender{
+    animation: entrada 1s;
     margin-left: auto;
     background-color: #898989;
     padding: 2vh;
@@ -84,7 +88,11 @@ footer{
 }
 
 @keyframes fadein {
-    from { opacity: 1; }
-    to   { opacity: 0; }
+    from { opacity: 1; margin-top: 40%}
+    to   { opacity: 0; margin-top: 0%}
 }
 
+@keyframes entrada {
+    from { opacity: 0; }
+    to   { opacity: 1;}
+}

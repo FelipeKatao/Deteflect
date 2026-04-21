@@ -1,10 +1,10 @@
-# Descobrir intenção
-Projeto de descoberta de intenção em um prompt, utilizando uma API para passagem de parametros , utilizando um prompt como leitura de contexto
+# DataFlect
+Intention discovery project in a prompt, using an API for parameter passing, using a prompt as context reading
 
 ## Configuração do projeto
-Utilizando Pytorch e Python, para utilizar precisa ter Python instalado em sua maquina ou no seu servidor.
+To use it you need to have Python installed on your machine or on your server.
 
-#Documentação do projeto 
+# Documentação do projeto 
 Para utilizar use as seguintes rotas para executa a aplicação em seu projeto.
 
 
