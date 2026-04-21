@@ -1,5 +1,5 @@
-import re
 from typing import Dict, List, Optional, Tuple
+import re
 
 import torch
 
@@ -51,10 +51,34 @@ _PREPS = {
     "para", "por", "sobre", "entre", "até",
 }
 
-_RE_MONEY = re.compile(r"^[Rr]\$?\s?\d+([.,]\d+)?$")
-_RE_NUMBER = re.compile(r"^\d+([.,]\d+)?$")
-_RE_HASHTAG = re.compile(r"^#\w+$", re.UNICODE)
-_RE_MENTION = re.compile(r"^@\w+$", re.UNICODE)
+
+STOPWORDS = {
+    "quero",
+    "preciso",
+    "gostaria",
+    "criar",
+    "remover",
+    "buscar",
+    "tabela",
+    "cliente"
+}
+
+
+ORG_HINTS = {
+    "empresa",
+    "escola",
+    "universidade",
+    "banco",
+    "loja",
+    "hospital"
+}
+
+_RE_HASHTAG = re.compile(r"#\w+")
+_RE_MENTION = re.compile(r"@\w+")
+_RE_NUMBER = re.compile(r"^\d+$")
+_RE_MONEY = re.compile(r"^(R\$|\$|€)\s?\d+([.,]\d+)?$")
+_RE_DATE = re.compile(r"\d{2}/\d{2}/\d{4}")
+_RE_PHONE = re.compile(r"\(?\d{2}\)?\s?\d{4,5}-?\d{4}")
 
 
 def _is_word(tok: str) -> bool:
@@ -128,50 +152,185 @@ class TorchNLP:
         return rel[: max(0, int(top_k))]
 
     def entidades_da_frase(self, text: str) -> List[Dict[str, str]]:
+
         text = normalize_text(text)
+
         tokens = tokenize(text)
+
         entities: List[Dict[str, str]] = []
 
-        def push_entity(txt: str, label: str) -> None:
+        def push_entity(txt: str, label: str):
+
             txt = txt.strip()
+
             if not txt:
                 return
-            entities.append({"text": txt, "label": label})
+
+            entities.append({
+                "text": txt,
+                "label": label
+            })
+
+        # -----------------------------
+        # 1) Regex-based entities
+        # -----------------------------
 
         for t in tokens:
+
+            t_clean = t.replace(" ", "")
+
             if is_url(t):
+
                 push_entity(t, "URL")
+
             elif is_email(t):
+
                 push_entity(t, "EMAIL")
+
+            elif _RE_PHONE.match(t):
+
+                push_entity(t, "PHONE")
+
             elif _RE_HASHTAG.match(t):
+
                 push_entity(t, "HASHTAG")
+
             elif _RE_MENTION.match(t):
+
                 push_entity(t, "MENTION")
-            elif _RE_MONEY.match(t.replace(" ", "")):
+
+            elif _RE_MONEY.match(t_clean):
+
                 push_entity(t, "MONEY")
+
+            elif _RE_DATE.match(t):
+
+                push_entity(t, "DATE")
+
             elif _RE_NUMBER.match(t):
+
                 push_entity(t, "NUMBER")
 
+        # -----------------------------
+        # 2) Detectar nomes compostos
+        # -----------------------------
+
         current: List[str] = []
-        for t in tokens + ["<END>"]:
-            is_title = (t[:1].isupper() and t[1:].islower() and _is_word(t))
+
+        for i, t in enumerate(tokens + ["<END>"]):
+
+            is_title = (
+                t[:1].isupper()
+                and t[1:].islower()
+                and _is_word(t)
+                and t.lower() not in STOPWORDS
+            )
+
             if is_title:
+
                 current.append(t)
+
                 continue
+
             if current:
+
                 joined = " ".join(current)
-                label = "PER" if len(current) >= 2 else "MISC"
+
+                label = "PER"
+
+                if len(current) == 1:
+
+                    label = "MISC"
+
                 push_entity(joined, label)
+
                 current = []
 
+        # -----------------------------
+        # 3) Detectar organizações
+        # -----------------------------
+
+        for i in range(len(tokens) - 1):
+
+            word = tokens[i].lower()
+
+            if word in ORG_HINTS:
+
+                name = []
+
+                j = i + 1
+
+                while j < len(tokens):
+
+                    t = tokens[j]
+
+                    if not t[:1].isupper():
+
+                        break
+
+                    name.append(t)
+
+                    j += 1
+
+                if name:
+
+                    push_entity(
+                        word + " " + " ".join(name),
+                        "ORG"
+                    )
+
+        # -----------------------------
+        # 4) Detectar entidades de domínio
+        # -----------------------------
+
+        DOMAIN_OBJECTS = {
+
+            "cliente": "ENTITY",
+
+            "pedido": "ENTITY",
+
+            "produto": "ENTITY",
+
+            "tabela": "DB_OBJECT",
+
+            "usuario": "ENTITY",
+
+            "aluno": "ENTITY"
+
+        }
+
+        for t in tokens:
+
+            if t.lower() in DOMAIN_OBJECTS:
+
+                push_entity(
+                    t,
+                    DOMAIN_OBJECTS[t.lower()]
+                )
+
+        # -----------------------------
+        # 5) Deduplicação otimizada
+        # -----------------------------
+
         uniq: List[Dict[str, str]] = []
+
         seen = set()
+
         for e in entities:
-            k = (e["text"], e["label"])
-            if k in seen:
+
+            key = (
+                e["text"].lower(),
+                e["label"]
+            )
+
+            if key in seen:
+
                 continue
-            seen.add(k)
+
+            seen.add(key)
+
             uniq.append(e)
+
         return uniq
 
     def classificador_palavras_relevantes(self, text: str) -> Tuple[List[str], List[float]]:
