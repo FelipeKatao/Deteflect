@@ -40,10 +40,6 @@ _ACTION_PREFIXES = (
     "vald",     
 )
 
-_CONTEXT_ATTR_HINTS = (
-    "pintad", "colorid", "cor", "cor:", "cor=", "cor-", "cor_", "corir",
-)
-
 _PREPS = {
     "de", "do", "da", "dos", "das",
     "com", "sem",

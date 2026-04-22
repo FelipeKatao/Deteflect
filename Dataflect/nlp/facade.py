@@ -4,13 +4,7 @@ from .torch_pipeline import TorchNLP
 
 
 class NLPFacade:
-    """
-    Classe final para uso no projeto:
-    - Basta passar `text` como parâmetro.
-    - Todos os métodos possuem retorno.
-    """
-
-    def __init__(self):
+    def __init__(self) -> None:
         self._nlp = TorchNLP()
 
     def sistema_de_sintaxe_correta(self, text: str) -> str:
@@ -36,4 +30,3 @@ class NLPFacade:
 
     def analisar(self, text: str) -> Dict[str, object]:
         return self._nlp.analisar(text)
-

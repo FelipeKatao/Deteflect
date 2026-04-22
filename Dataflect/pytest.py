@@ -1,11 +1,12 @@
 try:
-    import torch
+    import torch  # noqa: F401
+    _HAVE_TORCH = True
 except ModuleNotFoundError:
-    raise
+    _HAVE_TORCH = False
 
-from nlp import NLPFacade
 from nlp.intent import detect_intent_and_strip
 from nlp.sentiment import get_sentiment
+
 
 def _assert_contains_all(got, expected_set):
     got_set = {w.lower() for w in got}
@@ -14,6 +15,9 @@ def _assert_contains_all(got, expected_set):
 
 
 def test_palavras_fortes_contexto_objetos_exemplo():
+    if not _HAVE_TORCH:
+        return
+    from nlp import NLPFacade
     nlp = NLPFacade()
     text = "crie uma casa pintada de rosa"
     got = nlp.palavras_fortes_contexto_objetos(text)
@@ -21,6 +25,9 @@ def test_palavras_fortes_contexto_objetos_exemplo():
 
 
 def test_palavras_fortes_contexto_objetos_outro():
+    if not _HAVE_TORCH:
+        return
+    from nlp import NLPFacade
     nlp = NLPFacade()
     text = "gerar um relatório PDF com capa azul"
     got = nlp.palavras_fortes_contexto_objetos(text)
@@ -28,6 +35,9 @@ def test_palavras_fortes_contexto_objetos_outro():
 
 
 def test_varios_contextos_nao_quebra():
+    if not _HAVE_TORCH:
+        return
+    from nlp import NLPFacade
     nlp = NLPFacade()
     textos = [
         "buscar pedidos do cliente Maria",
@@ -47,15 +57,12 @@ def test_intent_crud_strip():
     intent, stripped = detect_intent_and_strip("criar uma coluna")
     assert intent == "CREATE"
     assert stripped.lower() == "uma coluna"
-
     intent, stripped = detect_intent_and_strip("buscar pedidos do cliente Maria")
     assert intent == "READ"
     assert "buscar" not in stripped.lower()
-
     intent, stripped = detect_intent_and_strip("remover usuário com email teste@exemplo.com")
     assert intent == "DELETE"
     assert "remover" not in stripped.lower()
-
     intent, stripped = detect_intent_and_strip("atualizar endereço para rua das flores 123")
     assert intent == "UPDATE"
     assert "atualizar" not in stripped.lower()
@@ -69,13 +76,27 @@ def test_sentiment():
     assert get_sentiment("não é ruim") == "POSITIVE"
 
 
+def test_intent_prefix_without_exact_keyword():
+    intent, stripped = detect_intent_and_strip("preciso remocao do cadastro antigo")
+    assert intent == "DELETE"
+    assert "remocao" not in stripped.lower()
+
+
+def test_rule_assimilation_typo():
+    from rules.RulesUser import RulesSintaxe
+    r = RulesSintaxe()
+    r.NewRule(("comprar", "produtos"), "READ", lambda: "ok")
+    hit = r.ResponseRule("quero comprarr produtos hoje", "READ", ["comprarr", "produtos"])
+    assert hit is not None
+    assert hit.get("match") == "assimilation"
+
+
 if __name__ == "__main__":
     test_palavras_fortes_contexto_objetos_exemplo()
     test_palavras_fortes_contexto_objetos_outro()
     test_varios_contextos_nao_quebra()
     test_intent_crud_strip()
+    test_intent_prefix_without_exact_keyword()
+    test_rule_assimilation_typo()
     test_sentiment()
     print("OK")
-
-
-print(detect_intent_and_strip("excluir a cliente Maria"))

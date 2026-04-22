@@ -1,3 +1,4 @@
+img[]
 # 🚀 Deteflect Framework
 
 An intelligent **Natural Language Processing (NLP)** framework designed to discover user intentions, analyze sentiment, extract entities, and execute custom rules based on natural language input. Built with Flask and PyTorch, Deteflect provides a powerful API for understanding and responding to user prompts with contextual awareness.
