@@ -49,4 +49,4 @@ class pnlp():
                 Return_Context["Complemento_valor"] = palavra
             if len(palavra) > 4:
                 prev_peso = peso
-            return Return_Context
+        return Return_Context

@@ -20,9 +20,9 @@ def Send(text):
     ctx = Response.get("context", {})
     return {"Response": f"""
        The user asked {text}. <br/>
-       And object of sentence is {str(Response["MajorKeywords"])} , with entities {str(Response["Entities"])}.<br/>
+       And object of sentence is {str(Response["Entidade"])} , with entities {str(Response["Objeto"])}.<br/>
        With aditional sentiment {str(Response["Sentiment"])}
-       and aditional intent {intent_name}
-       and context {str(ctx)}"""}
+       With  Itens {str(Response["Itens"])}
+       """}
 
 
