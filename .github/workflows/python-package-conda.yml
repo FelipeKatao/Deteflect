@@ -10,7 +10,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ./Dataflec
+        working-directory: /Dataflect
 
 
     steps:
