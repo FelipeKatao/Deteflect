@@ -8,6 +8,11 @@ jobs:
     strategy:
       max-parallel: 5
 
+    defaults:
+      run:
+        working-directory: ./Dataflec
+
+
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python 3.10
