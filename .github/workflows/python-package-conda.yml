@@ -10,7 +10,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: /Dataflect
+        working-directory: /home/runner/work/Deteflect/Deteflect
 
 
     steps:
