@@ -1,4 +1,4 @@
-security_enabled: true
+security_enabled: false
 Porta: 5000
 Proprietario: "Administrador"
 Usuario: "administrador"

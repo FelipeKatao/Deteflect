@@ -24,6 +24,21 @@
         </div>
     </div>
 
+    <!-- Botão de toggle do menu (fora do sidebar) -->
+    <button id="toggleSidebarBtn" class="toggle-menu-btn" title="Recolher/Expandir Menu">◀</button>
+
+    <!-- Menu Lateral -->
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h3>Chats</h3>
+            <button id="newChatBtn" class="new-chat-btn" title="Novo Chat">+</button>
+        </div>
+        <div id="chatList" class="chat-list">
+            <!-- Itens dos chats serão adicionados aqui dinamicamente -->
+        </div>
+    </div>
+
+    <!-- Página inicial (será convertida para chat dinâmico) -->
     <div class='page'>
         <nav class="nav"> <ul><li class="bold">Deteflect</li> <li class='content'>Documentation</li> </ul></nav>
         <div id='msg_input' class='msgs'>
@@ -38,6 +53,7 @@
         </div>
     </div>
     <footer>Created by Felipe Katao 2026, all rights reserved </footer>
+    <script src="./js/ChatsGenerate.js"></script>
     <script src="./js/Sender_Get_msg.js"></script>
     <script src="./js/modal.js"></script>
 </body>
