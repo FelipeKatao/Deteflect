@@ -3,85 +3,78 @@ import re
 class DataParser:
 
     def __init__(self):
-        self.stopwords = {
-            "um", "uma", "novo", "nova", "com", "de", "da", "do", "para", "o", "a"
+        self.stopwords = {"um", "uma", "novo", "nova", "com", "de", "para", "o", "a"}
+        self.connectors = {"e"}
+        self.verbs = {
+            "criar", "adicionar", "inserir", "buscar",
+            "deletar", "remover", "atualizar", "consultar"
         }
 
-        self.connectors = {"e", "and"}
-
-        self.known_objects = {
-            "usuario", "cliente", "tabela", "pedido","chamado","prioridade"
+        # possíveis campos conhecidos (ajuda a parar parsing)
+        self.possible_keys = {
+            "nome", "idade", "prioridade", "setor",
+            "tipo", "profissão", "cargo"
         }
 
     def parse(self, text):
-        text = text.lower()
-        words = text.split()
+        words = text.lower().split()
 
         result = {
             "objeto": None,
             "dados": {}
         }
 
-        # 🔥 1. identificar objeto
+        # 🔥 1. detectar objeto
         for w in words:
-            if w in self.known_objects:
+            if w not in self.stopwords and w not in self.verbs:
                 result["objeto"] = w
                 break
 
-        # 🔥 2. limpar palavras irrelevantes
-        filtered = [
-            w for w in words
-            if w not in self.stopwords and w not in self.connectors
-        ]
-
         i = 0
-        while i < len(filtered):
+        while i < len(words):
 
-            word = filtered[i]
+            word = words[i]
 
-            # ignorar verbos de ação
-            if word in ["criar", "inserir", "adicionar", "deletar", "remover", "buscar"]:
+            # ignorar irrelevantes
+            if word in self.stopwords or word in self.verbs or word in self.connectors:
                 i += 1
                 continue
 
-            # ignorar objeto
-            if word == result["objeto"]:
-                i += 1
-                continue
+            # 🔥 detectar chave
+            key = None
+            value_tokens = []
 
-            # 🔥 detectar chave composta (ex: "id processo")
-            if i + 1 < len(filtered):
-                next_word = filtered[i + 1]
+            # padrão: chave de valor
+            if i + 1 < len(words) and words[i + 1] == "de":
+                key = word
+                i += 2  # pula "chave de"
 
-                # caso especial: "id processo"
-                if word == "id":
-                    key = f"{word}_{next_word}"
-                    i += 2
-                else:
+            else:
+                # padrão: chave valor
+                if word in self.possible_keys:
                     key = word
                     i += 1
-            else:
-                break
+                else:
+                    i += 1
+                    continue
 
-            # 🔥 capturar valor (1 ou 2 tokens)
-            value_parts = []
+            # 🔥 coletar valor composto
+            while i < len(words):
+                current = words[i]
 
-            while i < len(filtered):
-                current = filtered[i]
-
-                # parar se próximo parece nova chave
-                if current in self.known_objects:
+                # parar se encontrar nova chave ou conector
+                if (
+                    current in self.connectors
+                    or current in self.verbs
+                    or current in self.possible_keys
+                ):
                     break
 
-                # parar se próximo parece outra chave comum
-                if current in ["nome", "idade", "profissão", "id"]:
-                    break
-
-                value_parts.append(current)
+                value_tokens.append(current)
                 i += 1
 
-            if value_parts:
-                value = " ".join(value_parts)
-                result["dados"][key] = value
+            # salvar valor
+            if key and value_tokens:
+                result["dados"][key] = " ".join(value_tokens)
 
         return result

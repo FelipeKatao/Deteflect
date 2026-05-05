@@ -3,20 +3,22 @@ import torch.nn as nn
 import torch.optim as optim
 import os
 
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer,logging
 from npl_dataset_intent import training_data
 from npl_model import IntentModel
 from npl_parser import DataParser
 
+logging.set_verbosity_error()
 MODEL_PATH = "model.pt"
 TOKENIZER_PATH = "tokenizer/"
 
 
 class NLPProcessor:
 
-    def __init__(self):
+    def __init__(self,train=False):
         self.model_name = "neuralmind/bert-base-portuguese-cased"
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+        if train:
+            self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
 
         self.intents = ["CREATE", "READ", "UPDATE", "DELETE"]
         self.sentiments = ["NEGATIVO", "NEUTRO", "POSITIVO"]
@@ -24,8 +26,7 @@ class NLPProcessor:
         self.model = IntentModel(
             self.model_name,
             len(self.intents),
-            len(self.sentiments)
-        )
+            len(self.sentiments))
 
         self.parser = DataParser()
 

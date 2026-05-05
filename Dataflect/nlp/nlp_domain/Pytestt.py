@@ -15,6 +15,7 @@ class App:
 
         if mode == "1":
             print("Treinando...")
+            self.processor = NLPProcessor(True)
             self.processor.train()
             print("OK")
 
