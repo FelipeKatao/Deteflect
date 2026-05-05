@@ -14,10 +14,7 @@ function sendMessageToAPI(msg, chatId) {
         if (!msgInput) return;
         
         const msgElement = document.createElement("div");
-        msgElement.classList.add("msg_receiver");
-        console.log(inputData["Config"])
-        console.log("DDD")
-        
+        msgElement.classList.add("msg_receiver");        
         msgElement.innerHTML = inputData["Response"];
         msgInput.appendChild(msgElement);
         

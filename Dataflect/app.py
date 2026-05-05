@@ -16,7 +16,7 @@ app.secret_key = config.get("SecretKey", "DataFlect_Secure_Key_2024")
 @app.route('/', methods=['GET'])
 def index():
     return {"Response": "Hello World"}
-
+# App Routes 
 app.register_blueprint(Responses)
 app.register_blueprint(GetConfig)
 
