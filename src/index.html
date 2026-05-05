@@ -9,7 +9,7 @@
 <body>
     <div id="app">
         <!-- Login Modal -->
-        <div id="loginModal" class="modal" :class="{ show: ui.loginModalOpen }" @click.self="ui.loginModalOpen = false">
+        <div id="loginModal" class="modal">
             <div class="modal-content">
                 <h2>Dataflect</h2>
                 <h2>Login</h2>
@@ -21,8 +21,6 @@
                         name="username"
                         placeholder="Digite seu usuário"
                         autocomplete="username"
-                        v-model="auth.username"
-                        @keyup.enter="focusPassword"
                     >
                 </div>
                 <div class="form-group">
@@ -33,14 +31,9 @@
                         name="password"
                         placeholder="Digite sua senha"
                         autocomplete="current-password"
-                        v-model="auth.password"
-                        @keyup.enter="login"
                     >
                 </div>
-                <button id="loginBtn" class="login-button" :disabled="auth.loading" @click="login">
-                    <span v-if="!auth.loading">Enter</span>
-                    <span v-else>...</span>
-                </button>
+                <button id="loginBtn" class="login-button">Enter</button>
             </div>
         </div>
 
@@ -48,119 +41,42 @@
         <button
             id="toggleSidebarBtn"
             class="toggle-menu-btn"
-            :class="{ collapsed: ui.sidebarCollapsed }"
             title="Recolher/Expandir Menu"
-            @click.stop="toggleSidebar"
         >◀</button>
 
         <!-- Menu Lateral -->
-        <div id="sidebar" class="sidebar" :class="{ collapsed: ui.sidebarCollapsed }">
+        <div id="sidebar" class="sidebar">
             <div class="sidebar-header">
                 <h3>Chats</h3>
-                <button id="newChatBtn" class="new-chat-btn" title="Novo Chat" @click="createNewChat()">+</button>
+                <button id="newChatBtn" class="new-chat-btn" title="Novo Chat">+</button>
             </div>
-            <div id="chatList" class="chat-list">
-                <div
-                    v-for="chat in chats"
-                    :key="chat.id"
-                    class="chat-item"
-                    :class="{ active: chat.id === activeChatId }"
-                    @click="switchToChat(chat.id)"
-                >
-                    <template v-if="editing.chatId === chat.id">
-                        <input
-                            class="chat-rename-input"
-                            :ref="setRenameInputRef(chat.id)"
-                            v-model="editing.draft"
-                            @click.stop
-                            @keydown.enter.prevent="commitRename()"
-                            @keydown.esc.prevent="cancelRename()"
-                            @blur="commitRename()"
-                        >
-                    </template>
-                    <template v-else>
-                        <span class="chat-name" :title="chat.name">{{ chat.name }}</span>
-                    </template>
-
-                    <button class="chat-menu-btn" title="Opções" @click.stop="toggleDropdown(chat.id)">...</button>
-
-                    <div class="chat-dropdown" :class="{ show: dropdown.chatId === chat.id }" @click.stop>
-                        <div class="chat-dropdown-item" @click="startRename(chat.id)">Renomear</div>
-                        <div class="chat-dropdown-item delete" @click="deleteChat(chat.id)">Deletar chat</div>
-                    </div>
-                </div>
-            </div>
+            <div id="chatList" class="chat-list"></div>
         </div>
 
-        <!-- Página (mantém estrutura; renderizada pelo Vue) -->
-        <div class='page' @click="hideDropdowns">
+        <div class="page">
             <nav class="nav">
                 <ul>
                     <li class="bold">Deteflect</li>
-                    <li class='content'>{{ activeChat?.name ?? 'Documentation' }}</li>
+                    <li class="content" id="activeChatName">Documentation</li>
                 </ul>
             </nav>
 
-            <div id="msg_input" class='msgs' ref="messagesViewport">
-                <div v-if="activeChat && activeChat.isFirst" id="welcome">
-                    <h1>Welcome to Deteflect Framework</h1>
-                    <h3>How can I help you?</h3>
-                </div>
+            <div id="messagesViewport" class="msgs"></div>
 
-                <template v-for="(m, idx) in (activeChat?.messages ?? [])" :key="activeChatId + '_' + idx">
-                    <div v-if="m.role === 'user'" class="msg_sender">{{ m.text }}</div>
-                    <div v-else class="msg_receiver">
-                        <template v-if="m.type === 'form'">
-                            <div>Here is the form to carry out the manipulation of the mentioned data</div>
-                            <form class="formDataPrompt" @submit.prevent="submitForm(m)">
-                                <div class="form-grid">
-                                    <div class="form-row" v-for="field in m.fields" :key="field">
-                                        <label :for="'f_' + activeChatId + '_' + field">{{ field }}</label>
-                                        <input
-                                            :id="'f_' + activeChatId + '_' + field"
-                                            type="text"
-                                            :name="field"
-                                            v-model="m.form[field]"
-                                            :disabled="m.submitting || m.submitted"
-                                        >
-                                    </div>
-                                </div>
-                                <div class="form-actions">
-                                    <button type="submit" :disabled="m.submitting || m.submitted">
-                                        <span v-if="!m.submitting && !m.submitted">Send</span>
-                                        <span v-else-if="m.submitting">...</span>
-                                        <span v-else>Sent</span>
-                                    </button>
-                                </div>
-                            </form>
-                        </template>
-                        <template v-else>
-                            <span v-html="m.html"></span>
-                        </template>
-                    </div>
-                </template>
-            </div>
-
-            <div class='input_sender'>
+            <div class="input_sender">
                 <input
                     type="text"
-                    name="input"
-                    id="input"
-                    v-model="composer.text"
-                    :disabled="composer.loading || !activeChatId"
+                    id="composerInput"
                     placeholder="Digite sua mensagem..."
-                    @keyup.enter="sendMessage"
+                    autocomplete="off"
                 >
-                <button type="submit" id="send" :disabled="composer.loading || !composer.text.trim()" @click="sendMessage">
-                    <span v-if="!composer.loading">Send</span>
-                    <span v-else>...</span>
-                </button>
+                <button type="button" id="sendBtn">Send</button>
             </div>
         </div>
-        <footer>Created by Felipe Katao 2026, all rights reserved </footer>
+
+        <footer>Created by Felipe Katao 2026, all rights reserved</footer>
     </div>
 
-    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
     <script src="./js/apiClient.js"></script>
     <script src="./js/app.js"></script>
 </body>

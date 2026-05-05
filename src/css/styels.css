@@ -296,6 +296,9 @@ body.sidebar-collapsed{
 .input_sender button:active{
     transform: translateY(1px);
 }
+.input_sender button.send-margin {
+    margin-left: 2vh;
+}
 .input_sender button:disabled{
     opacity: 0.65;
     cursor: not-allowed;
@@ -356,6 +359,8 @@ footer{
     height: 80vh;
     overflow: auto;
     margin: auto;
+    margin-bottom: 4vh;
+    margin-top:-4vh
 }
 .msg_receiver{
     margin-top:3vh;

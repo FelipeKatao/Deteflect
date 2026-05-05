@@ -437,7 +437,8 @@ async function SendForm(msg,idname, chatId) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(resultForm)});
             const data = await response.json();
-            const responseText = data;
+            const responseText = data["Response"];
+            console.log(responseText)
         const msgInput = document.getElementById('msg_input_'+chatId.id);
         const msgElement = document.createElement("div");
         msgElement.classList+='msg_receiver'
