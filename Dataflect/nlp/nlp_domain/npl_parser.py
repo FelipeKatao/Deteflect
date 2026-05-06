@@ -3,78 +3,67 @@ import re
 class DataParser:
 
     def __init__(self):
-        self.stopwords = {"um", "uma", "novo", "nova", "com", "de", "para", "o", "a"}
-        self.connectors = {"e"}
         self.verbs = {
-            "criar", "adicionar", "inserir", "buscar",
-            "deletar", "remover", "atualizar", "consultar"
+            "criar", "adicionar", "inserir",
+            "deletar", "remover",
+            "atualizar", "editar", "alterar",
+            "buscar", "consultar"
         }
 
-        # possíveis campos conhecidos (ajuda a parar parsing)
-        self.possible_keys = {
-            "nome", "idade", "prioridade", "setor",
-            "tipo", "profissão", "cargo"
-        }
+    def preprocess(self, text):
+        text = text.lower()
+
+        # remove ruído comum
+        text = re.sub(r"\b(com|e)\b", " ", text)
+        text = re.sub(r"\s+", " ", text)
+
+        return text.strip()
+
+    def extract_object(self, text):
+        words = text.split()
+
+        for w in words:
+            if w not in self.verbs:
+                return w
+
+        return None
+
+    def extract_pairs(self, text):
+        """
+        Captura:
+        nome Marcos idade 34 matricula 1234
+        """
+        pattern = r"(\w+)\s+([^0-9]+?|\d+[\d.,]*)\s*(?=\s\w+\s|$)"
+
+        matches = re.findall(pattern, text)
+
+        data = {}
+        for key, value in matches:
+            value = value.strip()
+
+            # limpa excesso tipo "marcos com"
+            value = re.sub(r"\b(com|e)\b.*", "", value).strip()
+
+            data[key] = value
+
+        return data
 
     def parse(self, text):
-        words = text.lower().split()
+        text = self.preprocess(text)
 
         result = {
-            "objeto": None,
+            "objeto": self.extract_object(text),
             "dados": {}
         }
 
-        # 🔥 1. detectar objeto
-        for w in words:
-            if w not in self.stopwords and w not in self.verbs:
-                result["objeto"] = w
-                break
+        # remove comando inicial
+        parts = text.split(result["objeto"], 1)
 
-        i = 0
-        while i < len(words):
+        if len(parts) > 1:
+            data_part = parts[1]
+        else:
+            data_part = text
 
-            word = words[i]
-
-            # ignorar irrelevantes
-            if word in self.stopwords or word in self.verbs or word in self.connectors:
-                i += 1
-                continue
-
-            # 🔥 detectar chave
-            key = None
-            value_tokens = []
-
-            # padrão: chave de valor
-            if i + 1 < len(words) and words[i + 1] == "de":
-                key = word
-                i += 2  # pula "chave de"
-
-            else:
-                # padrão: chave valor
-                if word in self.possible_keys:
-                    key = word
-                    i += 1
-                else:
-                    i += 1
-                    continue
-
-            # 🔥 coletar valor composto
-            while i < len(words):
-                current = words[i]
-
-                # parar se encontrar nova chave ou conector
-                if (
-                    current in self.connectors
-                    or current in self.verbs
-                    or current in self.possible_keys
-                ):
-                    break
-
-                value_tokens.append(current)
-                i += 1
-
-            # salvar valor
-            if key and value_tokens:
-                result["dados"][key] = " ".join(value_tokens)
+        result["dados"] = self.extract_pairs(data_part)
 
         return result

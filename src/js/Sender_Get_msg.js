@@ -65,5 +65,10 @@ function ConstruirMensagemResposta(){
 async function ReadAPI(msg){
 const response = await fetch('http://127.0.0.1:5000/sendmensage/API/' + msg);
     const data = await response.json();
-    return data["Response"]
+    console.log(data)
+    var Data = ""
+    Object.keys(data["Response"]["dados"]).forEach(element => {
+        Data+=element+": "+data["Response"]["dados"][element]+"  <br>"
+    });
+    return data["Response"]["acao"]+" "+Data + "<br> Sentiment:"+data["Response"]["sentimento"]
 }
