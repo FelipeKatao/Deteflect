@@ -6,13 +6,14 @@ var passwordInput = document.getElementById("password");
 
 // Show modal on page load
 window.onload = async function() {
-    const result = await ReadConfig()
-    if (result["security_enabled"] == true){
+    console.log(ReadSecury())
+    const result = await ReadSecury()
+    if (result == 1){
         modal.style.display = "block";
     }
 };
 
-loginBtn.addEventListener("click", async function() {
+loginBtn.addEventListener("click", function() {
     var username = usernameInput.value;
     var password = passwordInput.value;
     
@@ -20,13 +21,9 @@ loginBtn.addEventListener("click", async function() {
         alert("Por favor, preencha todos os campos!");
         return;
     }
-    var Login = await LoginSession(password,username)
-    if (Login["success"] == true){
-        modal.style.display = "none";
-    }
-    else{
-        alert("Login ou senha incorretos")
-    }
+    
+    modal.style.display = "none";
+    
 });
 
 passwordInput.addEventListener("keyup", function(event) {
@@ -42,15 +39,9 @@ usernameInput.addEventListener("keyup", function(event) {
 });
 
 
-async function ReadConfig(){
-const response = await fetch('http://127.0.0.1:5000/config/get',{method: 'GET'});
+async function ReadSecury(){
+const response = await fetch('http://127.0.0.1:5000/secury/check',{method: 'POST'});
     const data = await response.json();
-    console.log(data)
-    return data
+    console.log(data["Response"])
+    return data["Response"]
 }
-
-async function LoginSession(senha,login){
-const response = await fetch(`http://127.0.0.1:5000/config/security/${senha}/${login}`,{method: 'POST'});
-    const data = await response.json();
-    return data
-}   
