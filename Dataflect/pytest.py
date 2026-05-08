@@ -1,4 +1,6 @@
-from nlp.processIA.NplProcess import App
+from nlp.processIA.npl_app import App
 
 v = App()
-v.run()
+while(True):
+    txt = input("Digite algo: ")
+    print(v.run(txt))
