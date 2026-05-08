@@ -1,4 +1,7 @@
 Criar aluno com nome lucas idade 10 ok 
 Criar novo aluno com nome lucas idade 10 ok 
-Criar novo produto com nome Caderno Cor verde preço R$23,00
+Criar novo produto com nome Caderno Cor verde preço R$23,00 OK 
 Criar funcionario nome Marcos com Idade 34 e Matriculo 1234 ok
+Criar tarefa monitorar banco de dados para o horario das 10:00
+
+-- python -m spacy download pt_core_news_lg

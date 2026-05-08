@@ -207,3 +207,8 @@ marimo/_lsp/
 __marimo__/
 Dataflect/nlp/nlp_domain/model.pt
 Dataflect/nlp/Model_train.txt
+Dataflect/models/bertimbau/model.safetensors
+Dataflect/models/bertimbau/tokenizer.json
+
+
+models
