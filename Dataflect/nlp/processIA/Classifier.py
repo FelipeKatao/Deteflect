@@ -1,7 +1,3 @@
-import os
-import re
-import json
-import torch
 import torch.nn as nn
 from nlp.processIA.npl_app import INTENT_MAP,CUSTOM_MODEL_PATH,DEVICE,DEVICE,TRAINING_DATA,LABEL_TO_ID,INTENT_FALLBACK
 from .Npl_process  import LOCAL_MODEL_PATH

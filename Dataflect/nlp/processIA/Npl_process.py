@@ -1,14 +1,12 @@
 import os
 import re
-import json
 import torch
 import torch.nn as nn
 from .Database import INTENT_MAP,INTENT_FALLBACK,LABEL_TO_ID,TRAINING_DATA
 from .NplProcess import LOCAL_MODEL_PATH,CUSTOM_MODEL_PATH,DEVICE,DEVICE
 from .NplProcess import IntentClassifier
 from transformers import (
-    AutoTokenizer,
-    AutoModel
+    AutoTokenizer
 )
 
 class NLPProcessor:
@@ -44,10 +42,6 @@ class NLPProcessor:
             "novo",
             "nova"
         }
-
-    # =====================================================
-    # TRAIN
-    # =====================================================
 
     def train(self):
 
@@ -116,10 +110,6 @@ class NLPProcessor:
 
         print("Modelo treinado salvo.")
 
-    # =====================================================
-    # FALLBACK
-    # =====================================================
-
     def fallback_intent(self, text):
 
         text = text.lower()
@@ -132,11 +122,7 @@ class NLPProcessor:
                     return intent
 
         return None
-
-    # =====================================================
-    # BERT INTENT
-    # =====================================================
-
+    
     def predict_intent(self, text):
 
         # fallback primeiro
@@ -170,10 +156,6 @@ class NLPProcessor:
 
         return INTENT_MAP[pred]
 
-    # =====================================================
-    # ENTITY
-    # =====================================================
-
     def extract_entity(self, text):
 
         words = text.lower().split()
@@ -191,10 +173,6 @@ class NLPProcessor:
                 return word
 
         return None
-
-    # =====================================================
-    # GENERIC DATA PARSER
-    # =====================================================
 
     def extract_data(self, text):
 

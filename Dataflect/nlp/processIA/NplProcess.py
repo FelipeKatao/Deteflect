@@ -1,6 +1,4 @@
 import os
-import re
-import json
 import torch
 import torch.nn as nn
 from .Database import INTENT_MAP
@@ -22,7 +20,7 @@ DEVICE = torch.device(
 
 
 def download_model():
-
+  
     if os.path.exists(LOCAL_MODEL_PATH):
         return
 

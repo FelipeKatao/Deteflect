@@ -1,4 +1,8 @@
---- # Document 1
+--- #Config of project IA 
+type: Config_data
+Port: 8080
+Training_data: locad/
+
 env: production
 debug: false
 
