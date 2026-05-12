@@ -446,3 +446,72 @@ body{
     }
 
 }
+
+
+/* ================= CHAT ITEM ================= */
+
+.history-item{
+    position:relative;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    gap:10px;
+}
+
+.chat-name{
+    flex:1;
+
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+}
+
+/* ================= CHAT ACTIONS ================= */
+
+.chat-actions{
+    display:flex;
+    gap:8px;
+}
+
+.chat-actions button{
+    background:none;
+    border:none;
+
+    color:#94a3b8;
+
+    cursor:pointer;
+
+    font-size:14px;
+
+    transition:0.3s;
+}
+
+.chat-actions button:hover{
+    color:#38bdf8;
+}
+
+/* ================= STATUS ================= */
+
+.status{
+    font-weight:700;
+}
+
+.online{
+    color:#22c55e;
+}
+
+.away{
+    color:#facc15;
+}
+
+/* ================= SCROLL ================= */
+
+.chat-history{
+    overflow-y:auto;
+}
+
+#chatTitle{
+    font-size: 1.2vh;
+}
